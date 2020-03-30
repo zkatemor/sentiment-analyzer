@@ -1,3 +1,13 @@
-venv
-.idea
-__pycache__
+.idea/
+
+.cache/
+.pytest_cache/
+
+__pycache__/
+*.pyc
+*.pyo
+
+.env
+venv/
+
+/data
