@@ -1,6 +1,6 @@
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import Integer, String, ForeignKey, ARRAY
 
-from app import session
+from db import session
 
 
 class Dictionary(session.Model):
@@ -16,6 +16,9 @@ class Dictionary(session.Model):
             self.id, self.name
         )
 
+    def __str__(self):
+        return self.name
+
     def serialize(self):
         return {
             'id': self.id,
@@ -27,6 +30,7 @@ class Word(session.Model):
     __tablename__ = 'word'
     id = session.Column(Integer, primary_key=True, autoincrement=True)
     word = session.Column(String(120), nullable=False)
+    part_of_speech = session.Column(ARRAY(String()), nullable=False, default=[])
     tone = session.Column(String(50), nullable=False)
 
     dictionaryId = session.Column(Integer, ForeignKey('dictionary.id'), nullable=False)
@@ -41,6 +45,9 @@ class Word(session.Model):
         return "<Word(id={}, word={}, tone={}".format(
             self.id, self.word, self.tone
         )
+
+    def __str__(self):
+        return "{}_{}".format(self.word, self.part_of_speech)
 
     def serialize(self):
         return {
