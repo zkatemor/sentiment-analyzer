@@ -1,16 +1,12 @@
-from dotenv import load_dotenv
-from app import create_app
-from flask import render_template
-load_dotenv()
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 
-app = create_app()
+from app import app, session
 
+migrate = Migrate(app, session)
+manager = Manager(app)
 
-@app.route('/sentiment', methods=['GET'])
-def index():
-    """home page"""
-    return render_template("index.html")
-
+manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
-    app.run()
+    manager.run()
