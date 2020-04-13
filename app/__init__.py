@@ -2,7 +2,7 @@ def create_app():
     import os
 
     from flask import Flask
-    from apps.admin_panel import admin
+    from app.admin_panel import admin
     from db import session
 
     app = Flask(__name__)

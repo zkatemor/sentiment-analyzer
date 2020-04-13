@@ -3,7 +3,7 @@ from flask import render_template
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
-from apps import create_app
+from app import create_app
 from db import session
 
 load_dotenv()
