@@ -5,6 +5,40 @@
     <title>Sentiment Analyzer</title>
 </head>
 <body>
-Hello world!
+<div><h1>Классификация текста по тональности (чистый словарный метод) ДЕМО</h1>
+    <div>
+        <form method="post" action="/sentiment/analyzer">
+            <fieldset>
+                <ul>
+                    <li><label for="id_text">Введите текст</label>
+                        <div><textarea id="id_text" rows="12" cols="38" name="text"> {{ text }} </textarea>
+                        </div>
+                        <p>До 50000 символов</p></li>
+                </ul>
+                <button>Классифицировать</button>
+            </fieldset>
+        </form>
+    </div>
+    <div><h4>Результат классификации по тональности</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>Общая оценка</th>
+                <th>Позитивная оценка</th>
+                <th>Негативная оценка</th>
+                <th>Среднее арифметическое</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{ result['score'] }}</td>
+                <td>{{ result['positive'] }}</td>
+                <td>{{ result['negative'] }}</td>
+                <td>{{ result['comparative'] }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </body>
 </html>
