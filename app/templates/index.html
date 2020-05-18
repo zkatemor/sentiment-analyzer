@@ -3,23 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <title>Sentiment Analyzer</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Roboto, Helvetica, sans-serif;
+            background-color: #D1D1D1;
+            color: #7A7A7A;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #7A7A7A;
+            color: black;
+        }
+
+        .topnav a {
+            float: left;
+            color: #ffffff;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #A2A2A2;
+            color: white;
+        }
+
+        .topnav a.active {
+            background-color: #37356A;
+            color: white;
+        }
+
+        textarea {
+            padding: 25px 65px;
+            border: 1px solid #7A7A7A;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #37356A;
+            border-radius: 4px;
+            color: white;
+            padding: 10px 30px;
+            text-align: center;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-<div><h1>Классификация текста по тональности (чистый словарный метод) ДЕМО</h1>
+<div>
+    <div class="topnav">
+        <a class="active" href="/sentiment">Sentiment Analyzer</a>
+        <a href="#news">Dictionaries</a>
+        <a href="#about">About</a>
+    </div>
+
     <div>
         <form method="post" action="/sentiment/analyzer">
-            <fieldset>
-                <ul>
-                    <li><label for="id_text">Введите текст</label>
-                        <div><textarea id="id_text" rows="12" cols="38" name="text"> {{ text }} </textarea>
-                        </div>
-                        <p>До 50000 символов</p></li>
-                </ul>
-                <button>Классифицировать</button>
-            </fieldset>
+            <ul>
+                <label for="id_text">
+                    <p>
+                        <b>Тональность или сентимент текста (англ. sentiment)</b> – эмоциональная оценка, выражаемая в
+                        исследуемом тексте. Лексической тональностью (или лексическим сентиментом) называют
+                        эмоциональную
+                        составляющую, которая выражена на уровне лексемы. Таким образом, определение тональности всего
+                        текста зависит
+                        от лексической тональности отдельных единиц текста (лексем) и правил их сочетания, т. е. правил
+                        языка,
+                        на котором написан текст.
+                    </p>
+                    <p>
+                        <b>Классификация текста</b> – одна из задач информационного поиска, которая заключается в
+                        отнесении
+                        текста к одной или нескольким категориям (классам) на основании содержания текста.
+                    </p>
+                    <p>
+                        <b>Классификатор</b> – такой алгоритм, который относит входящие данные (текст) к одной или
+                        нескольким
+                        категориям (классам). Особенностью классификаторов является наличие заранее известных классов.
+                        Для
+                        задачи анализа тональности чаще всего имеется два класса – положительный и отрицательный.
+                    </p>
+
+                </label>
+                <div>
+                    <textarea id="id_text" cols="40" rows="8" name="text">{{text}}</textarea>
+                </div>
+                <button style="align-content: center">Классифицировать</button>
+            </ul>
         </form>
     </div>
-    <div><h4>Результат классификации по тональности</h4>
+    <div><h1>Результат классификации по тональности</h1>
         <table>
             <thead>
             <tr>
