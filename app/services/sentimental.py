@@ -17,7 +17,7 @@ class Sentimental(object):
         for wl_filename in self.__to_arg_list(dictionary):
             self.load_dictionary(wl_filename)
         for negations_filename in self.__to_arg_list(negation):
-            self.load_neagations(negations_filename)
+            self.load_negations(negations_filename)
 
         self.__negation_skip = {'a', 'an', 'so', 'too'}
 
@@ -40,16 +40,16 @@ class Sentimental(object):
         if token_idx > 0 and prev_idx >= 0 and tokens[prev_idx] in self.negations:
             is_prefixed = True
 
-        return is_prefixed
+        return is_prefixed, tokens[prev_idx]
 
-    def load_neagations(self, filename):
+    def load_negations(self, filename):
         with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             negations = set([row['token'] for row in reader])
         self.negations |= negations
 
     def load_dictionary(self, filename):
-        with open(filename, 'r',  encoding='utf-8') as f:
+        with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             dictionary = {row['term']: row['tone'] for row in reader}
         self.dictionary.update(dictionary)
@@ -63,13 +63,16 @@ class Sentimental(object):
         comparative = 0
 
         for i, token in enumerate(tokens):
-            is_prefixed_by_negation = self.__is_prefixed_by_negation(i, tokens)
-            if token in self.dictionary and not is_prefixed_by_negation:
+            is_prefixed_by_negation, negation = self.__is_prefixed_by_negation(i, tokens)
+            if token in self.dictionary:
                 tone = self.dictionary[token]
-
-                score = 1 if tone == 'positive' else -1
-                scores[tone] += score
                 words[tone].append(token)
+                score = 1 if tone == 'positive' else -1
+
+                if not is_prefixed_by_negation:
+                    scores[tone] += score
+                else:
+                    words['modifier'].append(negation)
 
         if len(tokens) > 0:
             comparative = (scores['positive'] + scores['negative']) / len(tokens)
@@ -79,6 +82,7 @@ class Sentimental(object):
             'positive': scores['positive'],
             'negative': scores['negative'],
             'comparative': comparative,
+            'words': words
         }
 
         return result

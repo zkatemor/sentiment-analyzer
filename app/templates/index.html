@@ -6,7 +6,7 @@
     <style>
         body {
             margin: 0;
-            font-family: Roboto, Helvetica, sans-serif;
+            font-family: Optima, sans-serif;
             background-color: #D1D1D1;
             color: #2b3036;
         }
@@ -40,6 +40,7 @@
             padding: 25px 65px;
             border: 1px solid #7A7A7A;
             font-size: 16px;
+            resize: none;
         }
 
         button {
@@ -49,6 +50,33 @@
             padding: 10px 30px;
             text-align: center;
             font-size: 16px;
+        }
+
+        table, td, th {
+            border: 1px solid #37356A;
+            text-align: left;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 15px;
+        }
+
+        .column {
+            float: left;
+            width: 50%;
+            padding: 10px;
+            height: 220px;
+        }
+
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
         }
     </style>
 </head>
@@ -60,7 +88,7 @@
         <a href="#about">About</a>
     </div>
 
-    <div>
+    <div style="padding: 10px;">
         <form method="post" action="/sentiment/analyzer">
             <ul>
                 <label for="id_text">
@@ -88,32 +116,53 @@
                     </p>
 
                 </label>
-                <div>
-                    <textarea id="id_text" cols="40" rows="8" name="text">{{text}}</textarea>
+                <div class="row">
+                    <textarea class="column" id="id_text" cols="40" rows="8" name="text">{{text}}</textarea>
+                    <img class="column" src="{{ url_for('static', filename=img) }}" style="width:200px;height:200px;"/>
                 </div>
                 <button style="align-content: center">Классифицировать</button>
             </ul>
+            <ul>
+                <div>
+                    <h2>Результат классификации по тональности</h2>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ОБЩАЯ ОЦЕНКА</th>
+                            <th>ПОЗИТИВНАЯ ОЦЕНКА</th>
+                            <th>НЕГАТИВНАЯ ОЦЕНКА</th>
+                            <th>СРЕДНЯЯ ОЦЕНКА</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{ result['score'] }}</td>
+                            <td>{{ result['positive'] }}</td>
+                            <td>{{ result['negative'] }}</td>
+                            <td>{{ result['comparative'] }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </ul>
+            <ul>
+                <h2>Распознанные слова из словарей и слова-модификаторы</h2>
+                <table>
+                    <tr>
+                        <th>ПОЗИТИВНЫЕ СЛОВА</th>
+                        <th>НЕГАТИВНЫЕ СЛОВА</th>
+                        <th>СЛОВА-МОДИФИКАТОРЫ</th>
+                    </tr>
+                    <tbody>
+                    <tr>
+                        <td>{{ result['words']['positive'] }}</td>
+                        <td>{{ result['words']['negative'] }}</td>
+                        <td>{{ result['words']['modifier'] }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </ul>
         </form>
-    </div>
-    <div><h1>Результат классификации по тональности</h1>
-        <table>
-            <thead>
-            <tr>
-                <th>Общая оценка</th>
-                <th>Позитивная оценка</th>
-                <th>Негативная оценка</th>
-                <th>Среднее арифметическое</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>{{ result['score'] }}</td>
-                <td>{{ result['positive'] }}</td>
-                <td>{{ result['negative'] }}</td>
-                <td>{{ result['comparative'] }}</td>
-            </tr>
-            </tbody>
-        </table>
     </div>
 </div>
 </body>

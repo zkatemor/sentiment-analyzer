@@ -31,10 +31,12 @@ def index():
         'positive': 0,
         'negative': 0,
         'comparative': 0,
+        'words': {"positive": "ldld"}
     }
-    text = "Сегодня не плохой день, а очень хороший!"
+    text = "Сегодня день не плохой, даже не ужасный, а очень хороший!"
+    img = 'hand.png'
 
-    return render_template("index.html", text=text, result=result)
+    return render_template("index.html", text=text, result=result, img=img)
 
 
 @app.route('/sentiment/analyzer', methods=['POST'])
@@ -44,7 +46,13 @@ def classifier():
     sent = Sentimental(dictionary=['app/dictionaries/rusentilex.csv'],
                        negation='app/dictionaries/negations.csv')
     result = sent.analyze(text)
-    return render_template("index.html", text=text, result=result)
+    if result['score'] > 0:
+        img = 'positive.png'
+    elif result['score'] == 0:
+        img = 'hand.png'
+    else:
+        img = 'negative.png'
+    return render_template("index.html", text=text, result=result, img=img)
 
 
 if __name__ == '__main__':
