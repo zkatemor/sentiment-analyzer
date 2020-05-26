@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentiment Analyzer | Dictionaries</title>
+    <link rel="icon" href="https://cdn.icon-icons.com/icons2/1856/PNG/512/sentiment-very-satisfied_116733.png"
+          type="image/x-icon">
+    <style>
+        body {
+            margin: 0;
+            font-family: Optima, sans-serif;
+            background-color: #D1D1D1;
+            color: #2b3036;
+        }
+
+        nav {
+            background: #7A7A7A;
+        }
+
+        nav ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav ul:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        nav a {
+            text-decoration: none;
+            display: block;
+            transition: .3s linear;
+        }
+
+        .topmenu > li {
+            float: left;
+            position: relative;
+            border-left: 1px solid #7A7A7A;
+        }
+
+        .topmenu > li:first-child {
+            border-left: 0;
+        }
+
+        .topmenu > li > a {
+            padding: 20px 30px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #FEFDFD;
+            letter-spacing: 2px;
+        }
+
+        .topmenu a:hover {
+            background: #aaaaab;
+        }
+
+        .topmenu > li > a.active,
+        .submenu a:hover {
+            color: white;
+            background: #37356A;
+        }
+
+        .topmenu .fa,
+        .submenu .fa {
+            margin-left: 5px;
+            color: inherit;
+        }
+
+        .submenu {
+            position: absolute;
+            z-index: 5;
+            min-width: 200px;
+            background: white;
+            border-top: 1px solid #CBCBCC;
+            border-left: 1px solid #CBCBCC;
+            border-right: 1px solid #CBCBCC;
+            visibility: hidden;
+            opacity: 0;
+            transform-origin: 0% 0%;
+            transform: rotateX(-90deg);
+            transition: .3s linear;
+        }
+
+        .submenu li {
+            position: relative;
+        }
+
+        .submenu li a {
+            color: #282828;
+            padding: 10px 20px;
+            font-size: 13px;
+            border-bottom: 1px solid #7A7A7A;
+        }
+
+        .submenu .submenu {
+            position: absolute;
+            left: 100%;
+            top: -1px;
+            transition: .3s linear;
+        }
+
+        nav li:hover > .submenu {
+            transform: rotateX(0deg);
+            visibility: visible;
+            opacity: 1;
+        }
+
+        textarea {
+            padding: 25px 65px;
+            border: 1px solid #7A7A7A;
+            font-size: 16px;
+            resize: none;
+        }
+
+        button {
+            background-color: #37356A;
+            border-radius: 4px;
+            color: white;
+            padding: 10px 30px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        table, td, th {
+            border: 1px solid #37356A;
+            text-align: left;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        th, td {
+            padding: 15px;
+        }
+
+        .column {
+            float: left;
+            width: 50%;
+            padding: 10px;
+            height: 220px;
+        }
+
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <ul class="topmenu">
+        <li><a href="/sentiment">Sentiment Analyzer<span class="fa fa-angle-down"></span></a></li>
+        <li><a href="/dictionaries/all" class="active">Dictionaries</a>
+            <ul class="submenu">
+                <li><a href="/dictionaries/rusentilex">RuSentiLex</a></li>
+                <li><a href="/dictionaries/cnn_unigram">CNN unigram</a></li>
+                <li><a href="/dictionaries/chi_unigram">CHI-SQUARE unigram</a></li>
+                <li><a href="/dictionaries/chi_bigram">CHI-SQUARE bigram</a></li>
+            </ul>
+        </li>
+        <li><a href="/analyze/files">Files Analyzer</a></li>
+        <li><a href="/about">About</a></li>
+    </ul>
+</nav>
+<div style="padding: 10px;">
+    <h2>{{ about_dictionary}}</h2>
+    <table>
+        <tr>
+            <th>СЛОВО/СЛОВОСОЧЕТАНИЕ (с частью речи)</th>
+            <th>ВЕС</th>
+        </tr>
+        <tbody>
+        {% for key in dictionary %}
+        <tr>
+            <td>{{key}}</td>
+            <td>{{dictionary[key]}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
