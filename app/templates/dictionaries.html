@@ -130,12 +130,30 @@
         }
 
         table {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
             border-collapse: collapse;
-            margin: 0 auto;
+            width: 100%;
         }
 
         th, td {
-            padding: 15px;
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: #37356A;
+            color: white;
         }
 
         .column {
@@ -152,38 +170,43 @@
         }
     </style>
 </head>
-<body>
-<nav>
-    <ul class="topmenu">
-        <li><a href="/sentiment">Sentiment Analyzer<span class="fa fa-angle-down"></span></a></li>
-        <li><a href="/dictionaries/all" class="active">Dictionaries</a>
-            <ul class="submenu">
-                <li><a href="/dictionaries/rusentilex">RuSentiLex</a></li>
-                <li><a href="/dictionaries/cnn_unigram">CNN unigram</a></li>
-                <li><a href="/dictionaries/chi_unigram">CHI-SQUARE unigram</a></li>
-                <li><a href="/dictionaries/chi_bigram">CHI-SQUARE bigram</a></li>
-            </ul>
-        </li>
-        <li><a href="/analyze/files">Files Analyzer</a></li>
-        <li><a href="/about">About</a></li>
+<div>
+    <nav>
+        <ul class="topmenu">
+            <li><a href="/sentiment">Sentiment Analyzer<span class="fa fa-angle-down"></span></a></li>
+            <li><a href="/dictionaries/all" class="active">Dictionaries</a>
+                <ul class="submenu">
+                    <li><a href="/dictionaries/cnn_unigram">CNN unigram</a></li>
+                    <li><a href="/dictionaries/chi_unigram">CHI-SQUARE unigram</a></li>
+                    <li><a href="/dictionaries/chi_bigram">CHI-SQUARE bigram</a></li>
+                </ul>
+            </li>
+            <li><a href="/analyze/files">Files Analyzer</a></li>
+            <li><a href="/about">About</a></li>
+        </ul>
+    </nav>
+    <ul style="margin-right: 3%;">
+        <div>
+            <h3>{{ name_dictionary}}</h3>
+            <label>
+                {{about_dictionary}}
+            </label>
+            <table>
+                <tr>
+                    <th>ТЕРМИН</th>
+                    <th>ВЕС</th>
+                </tr>
+                <tbody>
+                {% for key in dictionary %}
+                <tr>
+                    <td>{{key}}</td>
+                    <td>{{dictionary[key]}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </ul>
-</nav>
-<div style="padding: 10px;">
-    <h2>{{ about_dictionary}}</h2>
-    <table>
-        <tr>
-            <th>СЛОВО/СЛОВОСОЧЕТАНИЕ (с частью речи)</th>
-            <th>ВЕС</th>
-        </tr>
-        <tbody>
-        {% for key in dictionary %}
-        <tr>
-            <td>{{key}}</td>
-            <td>{{dictionary[key]}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 </div>
 </body>
 </html>

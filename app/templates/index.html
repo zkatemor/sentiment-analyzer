@@ -130,12 +130,30 @@
         }
 
         table {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
             border-collapse: collapse;
             width: 100%;
         }
 
         th, td {
-            padding: 15px;
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #37356A;
+            color: white;
         }
 
         .column {
@@ -159,7 +177,6 @@
             <li><a href="/sentiment" class="active">Sentiment Analyzer<span class="fa fa-angle-down"></span></a></li>
             <li><a href="/dictionaries/all">Dictionaries</a>
                 <ul class="submenu">
-                    <li><a href="/dictionaries/rusentilex">RuSentiLex</a></li>
                     <li><a href="/dictionaries/cnn_unigram">CNN unigram</a></li>
                     <li><a href="/dictionaries/chi_unigram">CHI-SQUARE unigram</a></li>
                     <li><a href="/dictionaries/chi_bigram">CHI-SQUARE bigram</a></li>
@@ -202,7 +219,7 @@
                     <textarea class="column" id="id_text" cols="40" rows="8" name="text">{{text}}</textarea>
                     <img class="column" src="{{ url_for('static', filename=img) }}" style="width:200px;height:200px;"/>
                 </div>
-                <button style="align-content: center">Классифицировать</button>
+                <button>Классифицировать</button>
             </ul>
             <ul>
                 <div>
