@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sentiment Analyzer | Dictionaries</title>
+    <title>Sentiment Analyzer | Files</title>
     <link rel="icon" href="https://cdn.icon-icons.com/icons2/1856/PNG/512/sentiment-very-satisfied_116733.png"
           type="image/x-icon">
     <style>
@@ -175,6 +175,16 @@
             display: table;
             clear: both;
         }
+
+        input,
+        input:before,
+        input:after {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            font: 1rem/1.5 Optima, sans-serif;
+            color: #5a5a5a;
+        }
     </style>
 </head>
 <body>
@@ -193,7 +203,37 @@
     </ul>
 </nav>
 <div>
-    Здесь будет анализ файлов.
+    <div style="padding: 25px;">
+        <form method="post" action="/analyze/files" enctype=multipart/form-data>
+            <ul>
+                <label>
+                    <p>
+                        На данной странице реализована классификация текстов на русском языке
+                        по тональности словарным методом с учётом слов-модификаторов. Тексты классифицируются по двум
+                        категориям – позитивная и негативная. Необходимо ввести в форму текстовый файл, тексты в котором
+                        будут проклассифицированы.
+                    </p>
+                    <p>
+                        Результат классификации будет выведен так же в файл, в котором будет
+                        полная информация об обработанных текстах:
+                    </p>
+                    <p>
+                        1) общая тональность;
+                    </p>
+                    <p>
+                        2) оценки двух тональностей;
+                    </p>
+                    <p>
+                        3) распозннаные в тексте тональные слова и слова-модификаторы.
+                    </p>
+                    <p>
+                        (в разработке)
+                    </p>
+                </label>
+                <p><input type=file name=file data-buttonText="Your label here."> <input type=submit value=Загрузить>
+            </ul>
+        </form>
+    </div>
 </div>
 </body>
 </html>

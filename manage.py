@@ -1,7 +1,10 @@
 import csv
+import os
+
+from werkzeug.utils import secure_filename
 
 from dotenv import load_dotenv
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, make_response, url_for
 from flask_restful import Api
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
@@ -13,6 +16,9 @@ from app.services.sentimental import Sentimental
 
 load_dotenv()
 
+UPLOAD_FOLDER = 'app/texts/uploads'
+ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'json'}
+
 app = create_app()
 
 migrate = Migrate(app, session)
@@ -23,6 +29,7 @@ manager.add_command('db', MigrateCommand)
 api = Api(app)
 api.add_resource(DictionaryView, '/dictionary')
 api.add_resource(WordView, '/word')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @app.route('/sentiment', methods=['GET'])
@@ -110,8 +117,18 @@ def about_project():
     return render_template("about.html")
 
 
-@app.route('/analyze/files', methods=['GET'])
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+@app.route('/analyze/files', methods=['GET', 'POST'])
 def files_classifier():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return render_template("files_analyze.html")
 
 
