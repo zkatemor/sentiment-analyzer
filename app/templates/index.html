@@ -120,6 +120,7 @@
             border-radius: 5px;
             border: 1px solid #7A7A7A;
             box-shadow: 1px 1px 1px #37356A;
+            resize: none;
         }
 
         button {
@@ -255,9 +256,9 @@
                     </tr>
                     <tbody>
                     <tr>
-                        <td>{{ result['words']['positive'] }}</td>
-                        <td>{{ result['words']['negative'] }}</td>
-                        <td>{{ result['words']['modifier'] }}</td>
+                        <td>{{ positive }}</td>
+                        <td>{{ negative }}</td>
+                        <td>{{ modifier }}</td>
                     </tr>
                     </tbody>
                 </table>

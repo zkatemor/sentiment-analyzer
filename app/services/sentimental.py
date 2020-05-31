@@ -59,20 +59,20 @@ class Sentimental(object):
         tokens = sentence_clean.split()
 
         scores = defaultdict(float)
-        words = defaultdict(list)
+        words = defaultdict(set)
         comparative = 0
 
         for i, token in enumerate(tokens):
             is_prefixed_by_negation, negation = self.__is_prefixed_by_negation(i, tokens)
             if token in self.dictionary:
                 tone = self.dictionary[token]
-                words[tone].append(token)
+                words[tone].add(token)
                 score = 1 if tone == 'positive' else -1
 
                 if not is_prefixed_by_negation:
                     scores[tone] += score
                 else:
-                    words['modifier'].append(negation)
+                    words['modifier'].add(negation)
 
         if len(tokens) > 0:
             comparative = (scores['positive'] + scores['negative']) / len(tokens)

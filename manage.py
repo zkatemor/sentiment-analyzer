@@ -44,8 +44,11 @@ def index():
     }
     text = "Сегодня день не плохой, даже не ужасный, а очень хороший!"
     img = 'hand.png'
-
-    return render_template("index.html", text=text, result=result, img=img)
+    positive = ""
+    negative = ""
+    modifier = ""
+    return render_template("index.html", text=text, result=result, img=img, positive=positive, negative=negative,
+                           modifier=modifier)
 
 
 @app.route('/analyze', methods=['POST'])
@@ -61,7 +64,18 @@ def classifier():
         img = 'hand.png'
     else:
         img = 'negative.png'
-    return render_template("index.html", text=text, result=result, img=img)
+
+    positive_str = [str(s) for s in result['words']['positive']]
+    positive = ", ".join(positive_str)
+
+    negative_str = [str(s) for s in result['words']['negative']]
+    negative = ", ".join(negative_str)
+
+    mod_str = [str(s) for s in result['words']['modifier']]
+    modifier = ", ".join(mod_str)
+
+    return render_template("index.html", text=text, result=result, img=img, positive=positive, negative=negative,
+                           modifier=modifier)
 
 
 @app.route('/dictionaries/<name>', methods=['GET'])
