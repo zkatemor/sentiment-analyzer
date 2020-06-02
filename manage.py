@@ -47,7 +47,12 @@ def index():
     positive = ""
     negative = ""
     modifier = ""
-    return render_template("index.html", text=text, result=result, img=img, positive=positive, negative=negative,
+    return render_template("index.html",
+                           text=text,
+                           result=result,
+                           img=img,
+                           positive=positive,
+                           negative=negative,
                            modifier=modifier)
 
 
@@ -74,7 +79,12 @@ def classifier():
     mod_str = [str(s) for s in result['words']['modifier']]
     modifier = ", ".join(mod_str)
 
-    return render_template("index.html", text=text, result=result, img=img, positive=positive, negative=negative,
+    return render_template("index.html",
+                           text=text,
+                           result=result,
+                           img=img,
+                           positive=positive,
+                           negative=negative,
                            modifier=modifier)
 
 
@@ -83,6 +93,7 @@ def get_dictionaries(name):
     about_dictionary = ""
     name_dictionary = ""
     dictionary = {}
+    html_file = ""
     if name == 'chi_unigram':
         name_dictionary = "Словарь униграм, построенный с помощью критерия согласия Пирсона (Хи-квадрат)"
         about_dictionary = "Распределение тонально-окрашенных слов с помощью критерия анализа – оценки корреляции " \
@@ -122,8 +133,20 @@ def get_dictionaries(name):
             dictionary_minus = dict(filter(None, csv.reader(f)))
         dictionary_minus.pop('term')
         dictionary.update(dictionary_minus)
-    return render_template("dictionaries.html", about_dictionary=about_dictionary, dictionary=dictionary,
-                           name_dictionary=name_dictionary)
+    elif name == 'all':
+        name_dictionary = "Словари оценочной лексики для классификации текстов по тональности"
+        html_file = "all_dictionary.html"
+        dictionary = dict(
+            хороший=1,
+            неплохой=0.5,
+            нехороший=-0.5,
+            плохой=-1
+        )
+    return render_template("dictionaries.html",
+                           about_dictionary=about_dictionary,
+                           dictionary=dictionary,
+                           name_dictionary=name_dictionary,
+                           html_file=html_file)
 
 
 @app.route('/about', methods=['GET'])

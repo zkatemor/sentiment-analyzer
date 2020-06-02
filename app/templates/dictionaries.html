@@ -194,10 +194,11 @@
     </nav>
     <ul style="margin-right: 3%;">
         <div>
-            <h3>{{ name_dictionary}}</h3>
+            <h2 style="text-align:center;">{{ name_dictionary}}</h2>
             <label>
                 {{about_dictionary}}
             </label>
+            {% include html_file ignore missing %}
             <table>
                 <tr>
                     <th>ТЕРМИН</th>
