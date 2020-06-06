@@ -177,6 +177,20 @@
             display: table;
             clear: both;
         }
+
+        select {
+            display: block;
+            font-weight: 700;
+            font-family: Optima, sans-serif;
+            color: #ffffff;
+            line-height: 1.3;
+            padding: .6em 1.4em .5em .48em;
+            border: 1px solid #aaa;
+            box-shadow: 0 1px 0 1px rgba(0, 0, 0, .04);
+            border-radius: .5em;
+            margin-bottom: 10px;
+            background: #7A7A7A;
+        }
     </style>
 </head>
 <body>
@@ -218,6 +232,13 @@
                     </p>
 
                 </label>
+                <select class="select-css">
+                    <option value="RuSentiLex">RuSentiLex</option>
+                    <option value="CNN unigram">CNN unigram</option>
+                    <option value="CHI unigram">CHI unigram</option>
+                    <option value="CHI bigram">CHI bigram</option>
+                    <option value="CHI unigram + bigram">CHI unigram + bigram</option>
+                </select>
                 <div class="row">
                     <textarea class="column" id="id_text" cols="40" rows="8" name="text">{{text}}</textarea>
                     <img class="column" src="{{ url_for('static', filename=img) }}" style="width:200px;height:200px;"/>
