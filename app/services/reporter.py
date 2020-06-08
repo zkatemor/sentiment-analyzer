@@ -2,7 +2,7 @@ import datetime as dt
 import json
 
 
-class Reporter(object):
+class Reporter:
     def __init__(self, text, result):
         self.text = text
         self.result = result

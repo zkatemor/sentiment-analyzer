@@ -1,5 +1,6 @@
 import csv
 import os
+import shutil
 
 from werkzeug.utils import secure_filename
 
@@ -33,6 +34,19 @@ api.add_resource(WordView, '/word')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+def delete_old_reports():
+    folder = 'app/static/reports'
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+
 @app.route('/sentiment', methods=['GET'])
 def index():
     try:
@@ -64,9 +78,17 @@ def index():
 
 @app.route('/analyze', methods=['POST'])
 def classifier():
+    delete_old_reports()
     text = request.form['text']
+    select = request.form.get('select')
+    dictionary = ['app/dictionaries/rusentilex.csv']
 
-    sent = Sentimental(dictionary=['app/dictionaries/rusentilex.csv'],
+    if str(select) == 'CHI unigram':
+        dictionary = ['app/dictionaries/chi_minus.csv', 'app/dictionaries/chi_plus.csv']
+    elif str(select) == 'CNN unigram':
+        dictionary = ['app/dictionaries/cnn_dict.csv']
+
+    sent = Sentimental(dictionary=dictionary,
                        negation='app/dictionaries/negations.csv',
                        modifier='app/dictionaries/modifier.csv')
     result = sent.analyze(text)

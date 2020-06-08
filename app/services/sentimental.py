@@ -1,11 +1,14 @@
-import re
 import os
 import csv
+import pymorphy2
+import nltk
 from collections import defaultdict
 
 
 class Sentimental(object):
     def __init__(self, dictionary=None, negation=None, modifier=None):
+        self.morph = pymorphy2.MorphAnalyzer()
+
         if dictionary is None and negation is None and modifier is None:
             base_dir = os.path.dirname(__file__)
             dictionary = [os.path.join(base_dir, p) for p in ['dictionaries/rusentilex.csv']]
@@ -72,12 +75,24 @@ class Sentimental(object):
     def load_dictionary(self, filename):
         with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
-            dictionary = {row['term']: row['tone'] for row in reader}
+            dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
         self.dictionary.update(dictionary)
 
+    def __clean_sentence(self, sentence):
+        # удаляем все символы, кроме кириллицы
+        regex_tokenizer = nltk.tokenize.RegexpTokenizer('[а-яА-ЯЁё]+')
+        # приводим к нижнему регистру
+        words = regex_tokenizer.tokenize(sentence.lower())
+        # приводим каждое слово в нормальную форму и добавляем тег - часть речи
+        result = [self.morph.parse(w)[0].normal_form for w in words]
+        return result
+
+    # удаление части речи в слове
+    def __delete_part_of_speech(self, word):
+        return word[:-5]
+
     def analyze(self, sentence):
-        sentence_clean = re.sub(r'[^\w ]', ' ', sentence.lower())
-        tokens = sentence_clean.split()
+        tokens = self.__clean_sentence(sentence)
 
         scores = defaultdict(float)
         words = defaultdict(set)
@@ -87,9 +102,9 @@ class Sentimental(object):
             is_prefixed_by_negation, negation = self.__is_prefixed_by_negation(i, tokens)
             is_prefixed_by_modifier, modifier, mod_percent = self.__is_prefixed_by_modifier(i, tokens)
             if token in self.dictionary:
-                tone = self.dictionary[token]
+                tone = 'positive' if float(self.dictionary[token]) > 0 else 'negative'
+                score = float(self.dictionary[token])
                 words[tone].add(token)
-                score = 1 if tone == 'positive' else -1
 
                 if not is_prefixed_by_negation:
                     scores[tone] += score
