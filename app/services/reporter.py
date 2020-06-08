@@ -10,21 +10,12 @@ class Reporter(object):
     def __get_dict(self):
         report = {
             'text': self.text,
-            'positive': [],
-            'negative': [],
-            'modifier': [],
+            'positive': list(self.result['words']['positive']),
+            'negative': list(self.result['words']['negative']),
+            'modifier': list(self.result['words']['modifier']),
             'score': self.result['score'],
             'sentiment': ""
         }
-
-        for i in self.result['words']['positive']:
-            report['positive'].append(i)
-
-        for i in self.result['words']['negative']:
-            report['negative'].append(i)
-
-        for i in self.result['words']['modifier']:
-            report['modifier'].append(i)
 
         if self.result['score'] > 0:
             report['sentiment'] = 'Положительная тональность. Чистая положительная оценка: ' + str(self.result['positive'])

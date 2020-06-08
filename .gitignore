@@ -9,7 +9,6 @@ __pycache__/
 
 .env
 venv/
-app/dictionaries/original/.csv
-app/static/reports/.json
+app/dictionaries/original
 
 /data

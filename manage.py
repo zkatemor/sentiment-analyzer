@@ -67,7 +67,8 @@ def classifier():
     text = request.form['text']
 
     sent = Sentimental(dictionary=['app/dictionaries/rusentilex.csv'],
-                       negation='app/dictionaries/negations.csv')
+                       negation='app/dictionaries/negations.csv',
+                       modifier='app/dictionaries/modifier.csv')
     result = sent.analyze(text)
     if result['score'] > 0:
         img = 'positive.png'
