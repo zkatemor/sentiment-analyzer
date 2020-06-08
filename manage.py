@@ -11,6 +11,7 @@ from flask_migrate import Migrate, MigrateCommand
 
 from app import create_app
 from app.api.views import DictionaryView, WordView
+from app.services.reporter import Reporter
 from db import session
 from app.services.sentimental import Sentimental
 
@@ -34,26 +35,31 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/sentiment', methods=['GET'])
 def index():
-    """home page"""
-    result = {
-        'score': 0,
-        'positive': 0,
-        'negative': 0,
-        'comparative': 0,
-        'words': {}
-    }
-    text = "Сегодня день не плохой, даже не ужасный, а очень хороший!"
-    img = 'hand.png'
-    positive = ""
-    negative = ""
-    modifier = ""
-    return render_template("index.html",
-                           text=text,
-                           result=result,
-                           img=img,
-                           positive=positive,
-                           negative=negative,
-                           modifier=modifier)
+    try:
+        """home page"""
+        result = {
+            'score': 0,
+            'positive': 0,
+            'negative': 0,
+            'comparative': 0,
+            'words': {}
+        }
+        text = "Сегодня день не плохой, даже не ужасный, а очень хороший!"
+        img = 'hand.png'
+        positive = ""
+        negative = ""
+        modifier = ""
+        download_file = ''
+        return render_template("index.html",
+                               text=text,
+                               result=result,
+                               img=img,
+                               positive=positive,
+                               negative=negative,
+                               modifier=modifier,
+                               download_file=download_file)
+    except Exception as e:
+        print(e)
 
 
 @app.route('/analyze', methods=['POST'])
@@ -79,13 +85,15 @@ def classifier():
     mod_str = [str(s) for s in result['words']['modifier']]
     modifier = ", ".join(mod_str)
 
+    report = Reporter(text, result).get_report()
     return render_template("index.html",
                            text=text,
                            result=result,
                            img=img,
                            positive=positive,
                            negative=negative,
-                           modifier=modifier)
+                           modifier=modifier,
+                           download_file=report)
 
 
 @app.route('/dictionaries/<name>', methods=['GET'])

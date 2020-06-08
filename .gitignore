@@ -9,5 +9,6 @@ __pycache__/
 
 .env
 venv/
+app/dictionaries/original
 
 /data
