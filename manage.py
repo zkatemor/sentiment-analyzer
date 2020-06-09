@@ -1,4 +1,5 @@
 import csv
+import json
 import os
 import shutil
 
@@ -12,6 +13,7 @@ from flask_migrate import Migrate, MigrateCommand
 
 from app import create_app
 from app.api.views import DictionaryView, WordView
+from app.services.random import Random
 from app.services.reporter import Reporter
 from db import session
 from app.services.sentimental import Sentimental
@@ -58,20 +60,17 @@ def index():
             'comparative': 0,
             'words': {}
         }
-        text = "Сегодня день не плохой, даже не ужасный, а очень хороший!"
+        random = Random('app/static/reviews.json')
+        text = random.get_review()
         img = 'hand.png'
-        positive = ""
-        negative = ""
-        modifier = ""
-        download_file = ''
         return render_template("index.html",
                                text=text,
                                result=result,
                                img=img,
-                               positive=positive,
-                               negative=negative,
-                               modifier=modifier,
-                               download_file=download_file)
+                               positive="",
+                               negative="",
+                               modifier="",
+                               download_file='')
     except Exception as e:
         print(e)
 
