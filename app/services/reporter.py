@@ -7,7 +7,7 @@ class Reporter:
         self.text = text
         self.result = result
 
-    def __get_dict(self):
+    def get_dict(self):
         report = {
             'text': self.text,
             'positive': list(self.result['words']['positive']),
@@ -18,14 +18,25 @@ class Reporter:
         }
 
         if self.result['score'] > 0:
-            report['sentiment'] = 'Положительная тональность. Чистая положительная оценка: ' + str(self.result['positive'])
+            report['sentiment'] = 'Положительная тональность. Чистая положительная оценка: ' + str(
+                self.result['positive'])
         else:
-            report['sentiment'] = 'Отрицательная тональность. Чистая отрицательная оценка: ' + str(self.result['negative'])
+            report['sentiment'] = 'Отрицательная тональность. Чистая отрицательная оценка: ' + str(
+                self.result['negative'])
 
         return report
 
     def get_report(self):
-        report = self.__get_dict()
+        report = self.get_dict()
+        date = str(dt.datetime.now().date()) + str(dt.datetime.now().time()).replace(".", ":").replace(":", "-")
+        filename = "app/static/reports/Отчёт-" + date + ".json"
+
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(report, f, ensure_ascii=False, indent=4)
+        return filename.replace('app/static/', '')
+
+    @staticmethod
+    def get_reports(report):
         date = str(dt.datetime.now().date()) + str(dt.datetime.now().time()).replace(".", ":").replace(":", "-")
         filename = "app/static/reports/Отчёт-" + date + ".json"
 

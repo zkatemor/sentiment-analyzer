@@ -1,8 +1,9 @@
 import csv
-import json
 import os
 import shutil
+import time
 
+import pandas as pd
 from werkzeug.utils import secure_filename
 
 from dotenv import load_dotenv
@@ -20,8 +21,8 @@ from app.services.sentimental import Sentimental
 
 load_dotenv()
 
-UPLOAD_FOLDER = 'app/texts/uploads'
-ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'json'}
+UPLOAD_FOLDER = 'app/static/uploads'
+ALLOWED_EXTENSIONS = {'xlsx'}
 
 app = create_app()
 
@@ -36,8 +37,7 @@ api.add_resource(WordView, '/word')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-def delete_old_reports():
-    folder = 'app/static/reports'
+def delete_old_files(folder):
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)
         try:
@@ -62,7 +62,7 @@ def index():
         }
         random = Random('app/static/reviews.json')
         text = random.get_review()
-        img = 'hand.png'
+        img = 'icons/hand.png'
         return render_template("index.html",
                                text=text,
                                result=result,
@@ -77,7 +77,7 @@ def index():
 
 @app.route('/analyze', methods=['POST'])
 def classifier():
-    delete_old_reports()
+    delete_old_files('app/static/reports')
     text = request.form['text']
     select = request.form.get('select')
     dictionary = ['app/dictionaries/rusentilex.csv']
@@ -86,17 +86,19 @@ def classifier():
         dictionary = ['app/dictionaries/chi_minus.csv', 'app/dictionaries/chi_plus.csv']
     elif str(select) == 'CNN unigram':
         dictionary = ['app/dictionaries/cnn_dict.csv']
+    elif str(select) == 'RuSentiLex':
+        dictionary = ['app/dictionaries/rusentilex.csv']
 
     sent = Sentimental(dictionary=dictionary,
                        negation='app/dictionaries/negations.csv',
                        modifier='app/dictionaries/modifier.csv')
     result = sent.analyze(text)
     if result['score'] > 0:
-        img = 'positive.png'
+        img = 'icons/positive.png'
     elif result['score'] == 0:
-        img = 'hand.png'
+        img = 'icons/hand.png'
     else:
-        img = 'negative.png'
+        img = 'icons/negative.png'
 
     positive_str = [str(s) for s in result['words']['positive']]
     positive = ", ".join(positive_str)
@@ -194,12 +196,40 @@ def allowed_file(filename):
 
 @app.route('/analyze/files', methods=['GET', 'POST'])
 def files_classifier():
+    delete_old_files('app/static/reports')
+    delete_old_files('app/static/uploads')
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            app.config['UPLOAD_FILENAME'] = filename
     return render_template("files_analyze.html")
+
+
+@app.route('/analyze/files/result', methods=['GET', 'POST'])
+def ajax_files():
+
+    if os.listdir(app.config['UPLOAD_FOLDER']):
+        filename = 'app/static/uploads/' + app.config['UPLOAD_FILENAME']
+        df = pd.read_excel(filename, sheet_name="Лист1")
+        texts = df['text'].tolist()
+
+        dictionary = ['app/dictionaries/chi_minus.csv', 'app/dictionaries/chi_plus.csv']
+
+        sent = Sentimental(dictionary=dictionary,
+                           negation='app/dictionaries/negations.csv',
+                           modifier='app/dictionaries/modifier.csv')
+        report = []
+
+        for text in texts:
+            result = sent.analyze(text)
+            report.append(Reporter(text, result).get_dict())
+
+        download_file = Reporter.get_reports(report)
+        return render_template('include_files.html', download_file=download_file)
+    else:
+        return '<h3>Файл ещё не загружен</h3>'
 
 
 if __name__ == '__main__':

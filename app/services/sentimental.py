@@ -38,7 +38,6 @@ class Sentimental(object):
         return obj
 
     def __is_prefixed_by_negation(self, token_idx, tokens):
-        #   True if i != 0 and tokens[i - 1] in self.negations else False
         prev_idx = token_idx - 1
         if tokens[prev_idx] in self.__negation_skip:
             prev_idx -= 1
@@ -106,10 +105,11 @@ class Sentimental(object):
                 score = float(self.dictionary[token])
                 words[tone].add(token)
 
-                if not is_prefixed_by_negation:
-                    scores[tone] += score
-                else:
+                if is_prefixed_by_negation:
+                    scores[tone] += score * -1
                     words['modifier'].add(negation)
+                else:
+                    scores[tone] += score
 
                 if is_prefixed_by_modifier:
                     scores[tone] += score * float(mod_percent)

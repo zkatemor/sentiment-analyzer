@@ -51,4 +51,5 @@ urllib3==1.25.9
 wcwidth==0.2.4
 Werkzeug==1.0.0
 WTForms==2.2.1
+xlrd==1.2.0
 zipp==3.1.0
