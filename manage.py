@@ -49,75 +49,71 @@ def delete_old_files(folder):
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
-@app.route('/sentiment', methods=['GET'])
+@app.route('/sentiment', methods=['GET', 'POST'])
 def index():
     try:
-        """home page"""
-        result = {
-            'score': 0,
-            'positive': 0,
-            'negative': 0,
-            'comparative': 0,
-            'words': {}
-        }
-        random = Random('app/static/reviews.json')
-        text = random.get_review()
-        img = 'icons/hand.png'
+        if request.method == 'GET':
+            """home page"""
+            result = {
+                'score': 0,
+                'positive': 0,
+                'negative': 0,
+                'comparative': 0,
+                'words': {}
+            }
+            random = Random('app/static/reviews.json')
+            text = random.get_review()
+            img = 'icons/hand.png'
+            positive = ''
+            negative = ''
+            modifier = ''
+            report = ''
+        else:
+            delete_old_files('app/static/reports')
+            text = request.form['text']
+            select = request.form.get('select')
+            dictionary = ['app/dictionaries/rusentilex.csv']
+
+            if str(select) == 'CHI unigram':
+                dictionary = ['app/dictionaries/chi_minus.csv', 'app/dictionaries/chi_plus.csv']
+            elif str(select) == 'CNN unigram':
+                dictionary = ['app/dictionaries/cnn_dict.csv']
+            elif str(select) == 'RuSentiLex':
+                dictionary = ['app/dictionaries/rusentilex.csv']
+
+            sent = Sentimental(dictionary=dictionary,
+                               negation='app/dictionaries/negations.csv',
+                               modifier='app/dictionaries/modifier.csv')
+            result = sent.analyze(text)
+            if result['score'] > 0:
+                img = 'icons/positive.png'
+            elif result['score'] == 0:
+                img = 'icons/hand.png'
+            else:
+                img = 'icons/negative.png'
+
+            positive_str = [str(s) for s in result['words']['positive']]
+            positive = ", ".join(positive_str)
+
+            negative_str = [str(s) for s in result['words']['negative']]
+            negative = ", ".join(negative_str)
+
+            mod_str = [str(s) for s in result['words']['modifier']]
+            modifier = ", ".join(mod_str)
+
+            report = Reporter(text, result).get_report()
+
         return render_template("index.html",
                                text=text,
                                result=result,
                                img=img,
-                               positive="",
-                               negative="",
-                               modifier="",
-                               download_file='')
+                               positive=positive,
+                               negative=negative,
+                               modifier=modifier,
+                               download_file=report)
+
     except Exception as e:
         print(e)
-
-
-@app.route('/analyze', methods=['POST'])
-def classifier():
-    delete_old_files('app/static/reports')
-    text = request.form['text']
-    select = request.form.get('select')
-    dictionary = ['app/dictionaries/rusentilex.csv']
-
-    if str(select) == 'CHI unigram':
-        dictionary = ['app/dictionaries/chi_minus.csv', 'app/dictionaries/chi_plus.csv']
-    elif str(select) == 'CNN unigram':
-        dictionary = ['app/dictionaries/cnn_dict.csv']
-    elif str(select) == 'RuSentiLex':
-        dictionary = ['app/dictionaries/rusentilex.csv']
-
-    sent = Sentimental(dictionary=dictionary,
-                       negation='app/dictionaries/negations.csv',
-                       modifier='app/dictionaries/modifier.csv')
-    result = sent.analyze(text)
-    if result['score'] > 0:
-        img = 'icons/positive.png'
-    elif result['score'] == 0:
-        img = 'icons/hand.png'
-    else:
-        img = 'icons/negative.png'
-
-    positive_str = [str(s) for s in result['words']['positive']]
-    positive = ", ".join(positive_str)
-
-    negative_str = [str(s) for s in result['words']['negative']]
-    negative = ", ".join(negative_str)
-
-    mod_str = [str(s) for s in result['words']['modifier']]
-    modifier = ", ".join(mod_str)
-
-    report = Reporter(text, result).get_report()
-    return render_template("index.html",
-                           text=text,
-                           result=result,
-                           img=img,
-                           positive=positive,
-                           negative=negative,
-                           modifier=modifier,
-                           download_file=report)
 
 
 @app.route('/dictionaries/<name>', methods=['GET'])
@@ -209,7 +205,6 @@ def files_classifier():
 
 @app.route('/analyze/files/result', methods=['GET', 'POST'])
 def ajax_files():
-
     if os.listdir(app.config['UPLOAD_FOLDER']):
         filename = 'app/static/uploads/' + app.config['UPLOAD_FILENAME']
         df = pd.read_excel(filename, sheet_name="Лист1")
