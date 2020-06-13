@@ -6,7 +6,7 @@ from collections import defaultdict
 
 
 class Sentimental(object):
-    def __init__(self, dictionary=None, negation=None, modifier=None):
+    def __init__(self, dictionary=None, negation=None, modifier=None, is_unigram=True):
         self.morph = pymorphy2.MorphAnalyzer()
 
         if dictionary is None and negation is None and modifier is None:
@@ -18,6 +18,7 @@ class Sentimental(object):
         self.dictionary = {}
         self.negations = set()
         self.modifiers = {}
+        self.is_unigram = is_unigram
 
         for wl_filename in self.__to_arg_list(dictionary):
             self.load_dictionary(wl_filename)
@@ -26,7 +27,7 @@ class Sentimental(object):
         for modifier_filename in self.__to_arg_list(modifier):
             self.load_modifiers(modifier_filename)
 
-        self.__negation_skip = {'очень', 'самый'}
+        self.__negation_skip = {'очень', 'самый', 'достаточно', 'должен'}
 
     @staticmethod
     def __to_arg_list(obj):
@@ -74,10 +75,13 @@ class Sentimental(object):
     def load_dictionary(self, filename):
         with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
-            dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
+            if self.is_unigram:
+                dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
+            else:
+                dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
         self.dictionary.update(dictionary)
 
-    def __clean_sentence(self, sentence):
+    def __get_tokens(self, sentence):
         # удаляем все символы, кроме кириллицы
         regex_tokenizer = nltk.tokenize.RegexpTokenizer('[а-яА-ЯЁё]+')
         # приводим к нижнему регистру
@@ -86,24 +90,39 @@ class Sentimental(object):
         result = [self.morph.parse(w)[0].normal_form for w in words]
         return result
 
-    # удаление части речи в слове
-    def __delete_part_of_speech(self, word):
-        return word[:-5]
+    def __get_bigrams(self, sentence):
+        regex_tokenizer = nltk.tokenize.RegexpTokenizer('[а-яА-ЯЁё]+')
+        words = regex_tokenizer.tokenize(sentence.lower())
+        result = [self.morph.parse(words[i])[0].normal_form + ' ' + self.morph.parse(words[i + 1])[0].normal_form
+                  for i in range(0, len(words) - 1)]
+        return result
+
+    # удаление части речи в слова или словосочетании
+    def __delete_part_of_speech(self, term):
+        if self.is_unigram:
+            new_term = term[:-5]
+        else:
+            terms = term.split()
+            new_term = terms[0][:-5] + ' ' + terms[1][:-5]
+        return new_term
 
     def analyze(self, sentence):
-        tokens = self.__clean_sentence(sentence)
+        if self.is_unigram:
+            terms = self.__get_tokens(sentence)
+        else:
+            terms = self.__get_bigrams(sentence)
 
         scores = defaultdict(float)
         words = defaultdict(set)
         comparative = 0
 
-        for i, token in enumerate(tokens):
-            is_prefixed_by_negation, negation = self.__is_prefixed_by_negation(i, tokens)
-            is_prefixed_by_modifier, modifier, mod_percent = self.__is_prefixed_by_modifier(i, tokens)
-            if token in self.dictionary:
-                tone = 'positive' if float(self.dictionary[token]) > 0 else 'negative'
-                score = float(self.dictionary[token])
-                words[tone].add(token)
+        for i, term in enumerate(terms):
+            is_prefixed_by_negation, negation = self.__is_prefixed_by_negation(i, terms)
+            is_prefixed_by_modifier, modifier, mod_percent = self.__is_prefixed_by_modifier(i, terms)
+            if term in self.dictionary:
+                tone = 'positive' if float(self.dictionary[term]) > 0 else 'negative'
+                score = float(self.dictionary[term])
+                words[tone].add(term)
 
                 if is_prefixed_by_negation:
                     scores[tone] += score * -1
@@ -115,8 +134,8 @@ class Sentimental(object):
                     scores[tone] += score * float(mod_percent)
                     words['modifier'].add(modifier)
 
-        if len(tokens) > 0:
-            comparative = (scores['positive'] + scores['negative']) / len(tokens)
+        if len(terms) > 0:
+            comparative = (scores['positive'] + scores['negative']) / len(terms)
 
         result = {
             'score': scores['positive'] + scores['negative'],

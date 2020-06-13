@@ -35,6 +35,8 @@ api = Api(app)
 api.add_resource(DictionaryView, '/dictionary')
 api.add_resource(WordView, '/word')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['DICTIONARY'] = ['app/dictionaries/rusentilex.csv']
+app.config['IS_UNIGRAM'] = True
 
 
 def delete_old_files(folder):
@@ -73,17 +75,26 @@ def index():
             text = request.form['text']
             select = request.form.get('select')
             dictionary = ['app/dictionaries/rusentilex.csv']
+            is_unigram = True
 
             if str(select) == 'CHI unigram':
                 dictionary = ['app/dictionaries/chi_minus.csv', 'app/dictionaries/chi_plus.csv']
+                is_unigram = True
             elif str(select) == 'CNN unigram':
                 dictionary = ['app/dictionaries/cnn_dict.csv']
+                is_unigram = True
             elif str(select) == 'RuSentiLex':
                 dictionary = ['app/dictionaries/rusentilex.csv']
+                is_unigram = True
+            elif str(select) == 'CHI bigram':
+                dictionary = ['app/dictionaries/chi_collocations_minus.csv',
+                              'app/dictionaries/chi_collocations_plus.csv']
+                is_unigram = False
 
             sent = Sentimental(dictionary=dictionary,
                                negation='app/dictionaries/negations.csv',
-                               modifier='app/dictionaries/modifier.csv')
+                               modifier='app/dictionaries/modifier.csv',
+                               is_unigram=is_unigram)
             result = sent.analyze(text)
             if result['score'] > 0:
                 img = 'icons/positive.png'
@@ -200,6 +211,23 @@ def files_classifier():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             app.config['UPLOAD_FILENAME'] = filename
+            select = request.form.get('select')
+            if str(select) == 'CHI unigram':
+                dictionary = ['app/dictionaries/chi_minus.csv', 'app/dictionaries/chi_plus.csv']
+                is_unigram = True
+            elif str(select) == 'CNN unigram':
+                dictionary = ['app/dictionaries/cnn_dict.csv']
+                is_unigram = True
+            elif str(select) == 'RuSentiLex':
+                dictionary = ['app/dictionaries/rusentilex.csv']
+                is_unigram = True
+            elif str(select) == 'CHI bigram':
+                dictionary = ['app/dictionaries/chi_collocations_minus.csv',
+                              'app/dictionaries/chi_collocations_plus.csv']
+                is_unigram = False
+            app.config['DICTIONARY'] = dictionary
+            app.config['IS_UNIGRAM'] = is_unigram
+
     return render_template("files_analyze.html")
 
 
@@ -210,11 +238,13 @@ def ajax_files():
         df = pd.read_excel(filename, sheet_name="Лист1")
         texts = df['text'].tolist()
 
-        dictionary = ['app/dictionaries/chi_minus.csv', 'app/dictionaries/chi_plus.csv']
+        dictionary = app.config['DICTIONARY']
+        is_unigram = app.config['IS_UNIGRAM']
 
         sent = Sentimental(dictionary=dictionary,
                            negation='app/dictionaries/negations.csv',
-                           modifier='app/dictionaries/modifier.csv')
+                           modifier='app/dictionaries/modifier.csv',
+                           is_unigram=is_unigram)
         report = []
 
         for text in texts:

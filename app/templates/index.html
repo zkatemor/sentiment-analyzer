@@ -236,7 +236,6 @@
                         <option value="CNN unigram">CNN unigram</option>
                         <option value="CHI unigram" selected>CHI unigram</option>
                         <option value="CHI bigram">CHI bigram</option>
-                        <option value="CHI unigram + bigram">CHI unigram + bigram</option>
                     </select>
                     <textarea class="column" id="id_text" cols="40" rows="8" name="text">{{text}}</textarea>
                     <img class="column" src="{{ url_for('static', filename=img) }}" style="width:200px;height:200px;"/>
@@ -267,11 +266,11 @@
                 </div>
             </ul>
             <ul>
-                <h3>Распознанные слова из словарей и слова-модификаторы:</h3>
+                <h3>Распознанные термины из словарей и слова-модификаторы:</h3>
                 <table>
                     <tr>
-                        <th>ПОЗИТИВНЫЕ СЛОВА</th>
-                        <th>НЕГАТИВНЫЕ СЛОВА</th>
+                        <th>ПОЗИТИВНЫЕ</th>
+                        <th>НЕГАТИВНЫЕ</th>
                         <th>СЛОВА-МОДИФИКАТОРЫ</th>
                     </tr>
                     <tbody>
