@@ -45,6 +45,8 @@ df = pd.read_excel('D:\\GitHub\\sentiment-analyzer\\app\static\\reviews.xlsx', s
 texts = df['Text'].tolist()
 ratings = df['Rating'].tolist()
 
+dictionary_rusentilex = ['D:\\GitHub\\sentiment-analyzer\\app\\dictionaries\\rusentilex.csv']
+
 dictionary_chi = ['D:\\GitHub\\sentiment-analyzer\\app\\dictionaries\\chi_minus.csv',
                   'D:\\GitHub\\sentiment-analyzer\\app\\dictionaries\\chi_plus.csv']
 
@@ -53,7 +55,7 @@ dictionary_cnn = ['D:\\GitHub\\sentiment-analyzer\\app\\dictionaries\\cnn_dict.c
 dictionary_chi_collocations = ['D:\\GitHub\\sentiment-analyzer\\app\\dictionaries\\chi_collocations_minus.csv',
                                'D:\\GitHub\\sentiment-analyzer\\app\\dictionaries\\chi_collocations_plus.csv']
 
-prediction, actual = get_report_test(dictionary_chi_collocations, False)
+prediction, actual = get_report_test(dictionary_rusentilex, True)
 
 data = {'prediction': prediction,
         'actual': actual
@@ -64,5 +66,5 @@ matrix = pd.crosstab(df['actual'], df['prediction'], rownames=['Actual'], colnam
 print(matrix)
 plt.figure(figsize=(10, 7))
 sn.heatmap(matrix, annot=True, cmap="Greens")
-plt.title("CHI BIGRAM")
+plt.title("RUSENTILEX")
 plt.show()

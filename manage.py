@@ -35,6 +35,7 @@ api = Api(app)
 api.add_resource(DictionaryView, '/dictionary')
 api.add_resource(WordView, '/word')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FILENAME'] = ''
 app.config['DICTIONARY'] = ['app/dictionaries/rusentilex.csv']
 app.config['IS_UNIGRAM'] = True
 
@@ -82,9 +83,6 @@ def index():
                 is_unigram = True
             elif str(select) == 'CNN unigram':
                 dictionary = ['app/dictionaries/cnn_dict.csv']
-                is_unigram = True
-            elif str(select) == 'RuSentiLex':
-                dictionary = ['app/dictionaries/rusentilex.csv']
                 is_unigram = True
             elif str(select) == 'CHI bigram':
                 dictionary = ['app/dictionaries/chi_collocations_minus.csv',
@@ -243,8 +241,7 @@ def ajax_files():
 
         sent = Sentimental(dictionary=dictionary,
                            negation='app/dictionaries/negations.csv',
-                           modifier='app/dictionaries/modifier.csv',
-                           is_unigram=is_unigram)
+                           modifier='app/dictionaries/modifier.csv', is_unigram=is_unigram)
         report = []
 
         for text in texts:

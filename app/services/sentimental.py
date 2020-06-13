@@ -75,10 +75,14 @@ class Sentimental(object):
     def load_dictionary(self, filename):
         with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
-            if self.is_unigram:
-                dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
+            if 'app/dictionaries/rusentilex.csv' in filename \
+                    or 'D:\\GitHub\\sentiment-analyzer\\app\\dictionaries\\rusentilex.csv' in filename:
+                dictionary = {row['term']: row['weight'] for row in reader}
             else:
-                dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
+                if self.is_unigram:
+                    dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
+                else:
+                    dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
         self.dictionary.update(dictionary)
 
     def __get_tokens(self, sentence):
