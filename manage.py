@@ -1,7 +1,7 @@
+"""исходный код программы классификации текста по тональности"""
 import csv
 import os
 import shutil
-import time
 
 import pandas as pd
 from werkzeug.utils import secure_filename
@@ -40,6 +40,7 @@ app.config['DICTIONARY'] = ['app/dictionaries/rusentilex.csv']
 app.config['IS_UNIGRAM'] = True
 
 
+# удаление старых файлов отчетов для экономии места на сервере
 def delete_old_files(folder):
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)

@@ -1,3 +1,4 @@
+""" словарный метод классификации """
 import os
 import csv
 import pymorphy2
@@ -15,11 +16,16 @@ class Sentimental(object):
             negation = os.path.join(base_dir, 'dictionaries/negations.csv')
             modifier = os.path.join(base_dir, 'dictionaries/modifier.csv')
 
+        # словарь оценочной лексики
         self.dictionary = {}
+        # слова-отрицатели
         self.negations = set()
+        # слова-усилители
         self.modifiers = {}
+        # является ли словарь - словарем униграм
         self.is_unigram = is_unigram
 
+        # загрузка словаря и модификаторов из назначенных файлов
         for wl_filename in self.__to_arg_list(dictionary):
             self.load_dictionary(wl_filename)
         for negations_filename in self.__to_arg_list(negation):
@@ -38,6 +44,7 @@ class Sentimental(object):
             obj = []
         return obj
 
+    # распознавание слов-отрицателей
     def __is_prefixed_by_negation(self, token_idx, tokens):
         prev_idx = token_idx - 1
         if tokens[prev_idx] in self.__negation_skip:
@@ -49,6 +56,7 @@ class Sentimental(object):
 
         return is_prefixed, tokens[prev_idx]
 
+    # распознавание слов-усилителей
     def __is_prefixed_by_modifier(self, token_idx, tokens):
         prev_idx = token_idx - 1
         percent = 0
@@ -85,6 +93,7 @@ class Sentimental(object):
                     dictionary = {self.__delete_part_of_speech(row['term']): row['weight'] for row in reader}
         self.dictionary.update(dictionary)
 
+    # разбивание текста на токены
     def __get_tokens(self, sentence):
         # удаляем все символы, кроме кириллицы
         regex_tokenizer = nltk.tokenize.RegexpTokenizer('[а-яА-ЯЁё]+')
@@ -94,6 +103,7 @@ class Sentimental(object):
         result = [self.morph.parse(w)[0].normal_form for w in words]
         return result
 
+    # разбивание текста на биграмы
     def __get_bigrams(self, sentence):
         regex_tokenizer = nltk.tokenize.RegexpTokenizer('[а-яА-ЯЁё]+')
         words = regex_tokenizer.tokenize(sentence.lower())
@@ -110,6 +120,7 @@ class Sentimental(object):
             new_term = terms[0][:-5] + ' ' + terms[1][:-5]
         return new_term
 
+    # словарный метод
     def analyze(self, sentence):
         if self.is_unigram:
             terms = self.__get_tokens(sentence)
@@ -141,6 +152,7 @@ class Sentimental(object):
         if len(terms) > 0:
             comparative = (scores['positive'] + scores['negative']) / len(terms)
 
+        # результат - словарь с отчетом
         result = {
             'score': scores['positive'] + scores['negative'],
             'positive': scores['positive'],
