@@ -18,8 +18,8 @@ Lexicon-based approach</h1>
 
 Источник: https://market-scanner.ru/doc/reviews
 
-* **app/static/rewiews_db.json** – набор данных для построения словаря оценочной лексики
-* **app/static/rewiews.json** – набор данных для тестирования метода классикации
+* **app/static/review_db.json** – набор данных для построения словаря оценочной лексики
+* **app/static/reviews.json** – набор данных для тестирования метода классикации
 * **app/dictionaries** - используемые словари оценочной лексики и слова-модификаторы
 
 <h2>Ссылка на проект</h2>
